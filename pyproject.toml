@@ -1,0 +1,15 @@
+[project]
+name = "usa-house-sales-assignment-1"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "darts>=0.41.0",
+    "numpy>=2.4.2",
+    "pandas>=3.0.1",
+    "scipy>=1.17.1",
+    "seaborn>=0.13.2",
+    "statsmodels>=0.14.6",
+    "xgboost>=3.2.0",
+]
