@@ -1,5 +1,4 @@
-#import "@local/report-template:0.1.0": conf
-#show: conf
+
 #align(center)[
   #v(2cm)
   #text(size: 24pt, weight: 700)[Final Assignment Report]
@@ -84,6 +83,19 @@ Confirmatory checks using both ADF (Augmented Dickey-Fuller) and KPSS tests on t
   image("resources/year_lags.png", width: 100%),
   caption: [ACF and PACF plots displaying a clear annual (52-week) seasonal pattern with significant spikes.]
 )
+
+== Seasonal Cleaning Check on the Transformed Series
+
+To verify that the main daily seasonal structure was effectively extracted, we inspected ACF/PACF after applying joint differencing: regular differencing ($d=1$) and seasonal differencing ($D=1, s=24$). The transformed diagnostics show a much flatter dependence profile, with most correlations oscillating close to zero outside the first short lags.
+
+#figure(
+	image("resources/clean_hour_lags.png", width: 100%),
+	caption: [ACF and PACF of the transformed hourly load after applying $d=1$ and $D=1$ with $s=24$. The dominant daily seasonal signature is strongly attenuated, confirming effective seasonal extraction.]
+)
+
+The key interpretation is that the strong seasonal peaks seen in the raw series are no longer dominant in the transformed space, which is consistent with correct seasonality cleaning. There are still mild structured spikes around multiples of 24 (especially in PACF), but they are substantially smaller.
+
+This reading also supports the lag design used in the feature-based models. Lag 1 captures immediate inertia, while lags 24 and 48 retain informative intra-day recurrence that may remain after transformation due to load-shape asymmetries and calendar effects. Lag 168 remains useful for operational forecasting because weekly behavior (weekday vs weekend profile) is not fully represented by a pure daily differencing operator and can still add predictive signal in supervised pipelines.
 
 
 = Forecasting Model Comparison
