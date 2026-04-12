@@ -1,4 +1,5 @@
-
+#import "@local/report-template:0.1.0": conf
+#show: conf
 #align(center)[
   #v(2cm)
   #text(size: 24pt, weight: 700)[Final Assignment Report]
