@@ -11,6 +11,28 @@ The comparison was executed with a strict causal protocol to avoid leakage and t
 - Core metrics: $R^2$, MAE, RMSE, and MASE.
 - Reference benchmark: the operational forecast available in the dataset.
 
+=== Feature Construction and Model Inputs
+
+Feature engineering was designed to represent short-term dynamics, daily and weekly seasonality, and meteorological effects without introducing leakage. The target series was first cleaned using the operational forecast as the primary imputation source, and any remaining gaps were completed through time interpolation. Weather information from multiple cities was aggregated into a single hourly signal and aligned with the energy index to create a consistent exogenous block.
+
+The final feature space combined calendar variables, weather covariates, autoregressive lags, and rolling statistics. Calendar information included hour, day of week, month, and a weekend indicator. Weather-related inputs included temperature (also converted to Celsius), humidity, wind speed, pressure, cloud coverage, and rain intensity. To capture persistence and recurrent consumption cycles, lag features at 1, 24, 48, and 168 hours were added. In parallel, rolling mean and rolling standard deviation were computed over 24-hour and 168-hour windows using shifted values to preserve strict causality.
+
+In the modeling stage, these variables were consumed differently by each family. Baseline_ML used the complete engineered feature matrix. SARIMAX used a reduced exogenous subset focused on physically interpretable drivers (temperature, humidity, wind speed, wind generation, hour, and day of week), while SARIMA operated only on the univariate demand history. For the hybrid models, engineered features were also used to learn residual corrections: XGBoost received the feature matrix plus the SARIMA prediction, and the BaselineML_TimesFM_2_5 workflow modeled the residual trajectory produced by the baseline regressor.
+
+#table(
+	columns: 3,
+	inset: 6pt,
+	align: left,
+	[*Feature Group*], [*Variables*], [*Used By*],
+
+	[Calendar], [hour, dayofweek, month, is_weekend], [Baseline_ML, SARIMAX, Hybrid_SARIMA_XGB],
+	[Weather], [temp_c, humidity, wind_speed, pressure, clouds_all, rain_1h], [Baseline_ML, SARIMAX, Hybrid_SARIMA_XGB],
+	[Lags], [lag_1, lag_24, lag_48, lag_168], [Baseline_ML, Hybrid_SARIMA_XGB],
+	[Rolling stats], [roll_mean_24, roll_std_24, roll_mean_168, roll_std_168], [Baseline_ML, Hybrid_SARIMA_XGB],
+	[SARIMAX exogenous subset], [temp_c, humidity, wind_speed, generation wind onshore, hour, dayofweek], [SARIMAX],
+	[Residual targets], [y - prediction residual series], [Hybrid_SARIMA_XGB, BaselineML_TimesFM_2_5]
+)
+
 === Models Evaluated
 
 The set of evaluated models covered a broad spectrum of forecasting strategies. It included Baseline_Operative, which corresponds to the day-ahead operational forecast available in the dataset, and Baseline_ML, a feature-based linear machine learning baseline used as a strong reference among custom approaches. It also included SARIMA as the core seasonal statistical model and SARIMAX as its extension with exogenous covariates. To test hybrid statistical-learning behavior, the study incorporated Hybrid_SARIMA_XGB, where SARIMA predictions are corrected through XGBoost residual modeling. On the deep learning side, TimesFM_2_5 was evaluated as a standalone foundation model, and BaselineML_TimesFM_2_5 was tested as a residual hybrid in which TimesFM forecasts the error component of the baseline ML model.
