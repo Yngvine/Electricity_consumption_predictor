@@ -71,7 +71,7 @@ Decomposition and autocorrelation analysis (ACF/PACF) on the primary hourly reso
   caption: [Decomposition of the hourly electrical load series into trend, seasonal, and residual components. The top panel shows the original series with a clear upward trend and strong seasonal cycles. The middle panel isolates the seasonal component, highlighting the consistent daily and weekly patterns. The bottom panel displays the residuals, which appear stationary and suitable for further modeling.]
 )
 
-Confirmatory checks using both ADF (Augmented Dickey-Fuller) and KPSS tests on the primary hourly series indicate statistical stationarity overall. However, applying regular differencing ($d=1$) and seasonal differencing ($D=1, s=24$) heavily cleans the short-memory structure, making the series highly suitable for classical lag-based modelling techniques.
+Confirmatory checks using both ADF (Augmented Dickey-Fuller) and KPSS tests on the primary hourly series yield conflicting results (ADF indicates stationarity, while KPSS indicates non-stationarity). This combination typically suggests that the series is trend-stationary or difference-stationary. Indeed, applying regular differencing ($d=1$) and seasonal differencing ($D=1, s=24$) heavily cleans the short-memory structure, making the series highly suitable for classical lag-based modelling techniques.
 #figure(
   image("resources/hour_lags.png", width: 100%),
   caption: [ACF and PACF plots displaying a clear 24h seasonal pattern with significant spikes.]
